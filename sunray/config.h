@@ -119,8 +119,10 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 // ...for the older 42mm diameter motor (white connector)  https://wiki.ardumower.de/images/d/d6/Ardumower_chassis_inside_ready.jpg
 // #define TICKS_PER_REVOLUTION  1050 / 2    // odometry ticks per wheel revolution 
 
-// ...for the brushless motor 4/2021   https://wiki.ardumower.de/index.php?title=Datei:BLUnit.JPG
-// #define TICKS_PER_REVOLUTION  1194 / 2    // odometry ticks per wheel revolution
+// ...for the brushless motor april 2021   https://wiki.ardumower.de/index.php?title=Datei:BLUnit.JPG
+//#define TICKS_PER_REVOLUTION  1300 / 2    // 1194/2  odometry ticks per wheel revolution
+
+// #define TICKS_PER_REVOLUTION  304     // odometry ticks per wheel revolution (RM18)
 
 
 // ----- gear motors --------------------------------------------------
@@ -166,12 +168,28 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 #define WIFI_SSID "myssid"            // choose WiFi network ID
 #define WIFI_PASS "mypassword"      // choose WiFi network password
 
-#define ENABLE_SERVER true          // must be enabled for web app
-//#define ENABLE_SERVER false
+// client (app) --->  server (robot)
+#define ENABLE_SERVER true          // must be enabled if robot should act as server (recommended)
+//#define ENABLE_SERVER false           // must be disabled if robot should act as client (requires external relay server)
+
+// a relay server allows to access the robot via the Internet by transferring data from app to robot and vice versa (not available yet, highly experimental)
+// client (app) --->  relay server  <--- client (robot)
+#define ENABLE_RELAY false            // must be enabled to use relay server
+#define RELAY_USER "username"         // choose a unique user name/number!
+#define RELAY_MACHINE "robot1"        // choose a unique robot id
+#define RELAY_HOST "grauonline.net"   // relay server name
+#define RELAY_PORT 5000               // relay server port 
 
 //#define ENABLE_UDP 1                // enable console for UDP? (for developers only)
 #define UDP_SERVER_IP   192,168,2,56     // remote UDP IP and port to connect to
 #define UDP_SERVER_PORT 4210
+
+// --------- NTRIP client (linux only, highly experimental) ---------------------------------
+#define NTRIP_HOST "195.227.70.119"   // sapos nrw
+#define NTRIP_PORT 2101
+#define NTRIP_MOUNT "VRS_3_4G_NW"
+#define NTRIP_USER "user"
+#define NTRIP_PASS "pass"
 
 // ------ MQTT (highly experimental - ENABLE_SERVER must be set to false for this to work :-/ ) -----------------------------
 // you can access your robot using a MQTT broker - choose a topic prefix for your robot below - available MQTT topics:
@@ -190,13 +208,16 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 // see Wiki on how to install the ultrasonic sensors: 
 // https://wiki.ardumower.de/index.php?title=Ardumower_Sunray#Ultrasonic_sensor
 
-//#define SONAR_ENABLE true
-#define SONAR_ENABLE false
+#define SONAR_ENABLE true
+//#define SONAR_ENABLE false
 #define SONAR_TRIGGER_OBSTACLES true     // should sonar be used to trigger obstacles? if not, mower will only slow down
 #define SONAR_LEFT_OBSTACLE_CM   10      // stop mowing operation below this distance (cm) 
 #define SONAR_CENTER_OBSTACLE_CM 10      // stop mowing operation below this distance (cm) 
 #define SONAR_RIGHT_OBSTACLE_CM  10      // stop mowing operation below this distance (cm) 
 
+// ------ rain sensor ----------------------------------------------------------
+//#define RAIN_ENABLE true                 // if activated, mower will dock when rain sensor triggers
+#define RAIN_ENABLE false
 
 // ------ time-of-flight distance sensor (VL53L0X) -----------------------------
 // do not use this sensor (not recommended)
@@ -211,7 +232,7 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 // https://wiki.ardumower.de/index.php?title=Free_wheel_sensor
 // #define BUMPER_ENABLE true
 #define BUMPER_ENABLE false
-#define BUMPER_DEADTIME 5000  // linear motion dead-time (ms) after bumper is allowed to trigger
+#define BUMPER_DEADTIME 1000  // linear motion dead-time (ms) after bumper is allowed to trigger
 
 
 // ----- battery charging current measurement (INA169) --------------
@@ -256,10 +277,10 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 // configure ublox f9p with optimal settings (will be stored in f9p RAM only)
 // NOTE: due to a PCB1.3 bug GPS_RX pin is not working and you have to fix this by a wire:
 // https://wiki.ardumower.de/index.php?title=Ardumower_Sunray#PCB1.3_GPS_pin_fix   (see step 2)
-#define GPS_CONFIG   true     // configure GPS receiver (recommended )
-//#define GPS_CONFIG   false  // do not configure GPS receiver
+#define GPS_CONFIG   true     // configure GPS receiver (recommended - requires GPS wire fix above!)
+//#define GPS_CONFIG   false  // do not configure GPS receiver (no GPS wire fix required)
 
-#define GPS_CONFIG_FILTER   true     // use signal strength filter? (recommended)
+#define GPS_CONFIG_FILTER   true     // use signal strength filter? (recommended to get rid of 'FIX jumps')
 //#define GPS_CONFIG_FILTER   false     // use this if you have difficulties to get a FIX solution
 
 
@@ -280,7 +301,8 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 
 #define ENABLE_PATH_FINDER  true     // path finder is experimental (can be slow - you may have to wait until robot actually starts)
 //#define ENABLE_PATH_FINDER  false
-#define ALLOW_ROUTE_OUTSIDE_PERI_METER 1.0   // max. distance (m) to allow routing from outside perimeter
+#define ALLOW_ROUTE_OUTSIDE_PERI_METER 1.0   // max. distance (m) to allow routing from outside perimeter 
+                                              // (increase if you get 'no map route' errors near perimeter)
 
 // is a docking station available?
 #define DOCKING_STATION true   // use this if docking station available and mower should dock automatically
@@ -301,6 +323,11 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 //#define RCMODEL_ENABLE true
 #define RCMODEL_ENABLE false
 
+// button control (turns on additional features via the POWER-ON button)
+#define BUTTON_CONTROL true      // additional features activated (press-and-hold button for specific beep count: 
+                                 //  1 beep=start/stop, 5 beeps=dock, 3 beeps=R/C mode ON/OFF)
+//#define BUTTON_CONTROL false   // additional features deactivated
+
 
 // --------- serial monitor output (CONSOLE) ------------------------
 // which Arduino Due USB port do you want to your for serial monitor output (CONSOLE)?
@@ -312,7 +339,7 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 #elif __SAMD51__
   #define BOARD "Adafruit Grand Central M4"
   #define CONSOLE Serial      // Adafruit Grand Central M4 
-#else 
+#elif __linux__ 
   #define BOARD "Raspberry PI"
   #define CONSOLE Console 
 #endif
@@ -327,17 +354,25 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 
 #ifdef _SAM3XA_                 // Arduino Due
   #define WIFI Serial1
+  #define ROBOT Serial1
   #define BLE Serial2
   #define GPS Serial3
   //#define GPS Serial                // only use this for .ubx logs (sendgps.py)
 #elif __SAMD51__                      // Adafruit Grand Central M4 
-  #define WIFI Serial2                
+  #define WIFI Serial2 
+  #define ROBOT Serial2               
   #define BLE Serial3
   #define GPS Serial4
 #elif __linux__ 
-  #define WIFI Serial2                
-  #define BLE Serial3
-  #define GPS Serial4
+  #define WIFI SerialWIFI                
+  #define SERIAL_WIFI_PATH "/dev/null"  
+  #define BLE SerialBLE
+  #define GPS SerialGPS
+  #define SERIAL_GPS_PATH "/dev/serial/by-id/usb-u-blox_AG_-_www.u-blox.com_u-blox_GNSS_receiver-if00"  
+  #define ROBOT SerialROBOT
+  #define SERIAL_ROBOT_PATH "/dev/ttyUSB1"  
+  #define NTRIP SerialNTRIP
+  #define SERIAL_NTRIP_PATH "/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_00000000-if00-port0"    
 #endif
 
 
