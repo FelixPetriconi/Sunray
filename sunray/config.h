@@ -3,11 +3,16 @@
 // Licensed GPLv3 for open source use
 // or Grau GmbH Commercial License for commercial use (http://grauonline.de/cms2/?page_id=153)
 
-/* see Wiki for installation details:
+/* 
+   WARNING: all software, hardware and motor components are designed and optimized as a whole, if you 
+   try to replace or exclude some component not as designed, you risk to damage your hardware with 
+   the software.
+
+   see Wiki for installation details:
    http://wiki.ardumower.de/index.php?title=Ardumower_Sunray
 
    requirements:
-   + Ardumower chassis and Ardumower motors   
+   + Ardumower chassis and Ardumower kit mowing and gear motors   
    + Ardumower PCB 1.3 
    +   Adafruit Grand Central M4 (highly recommended) or Arduino Due 
    +   Ardumower BLE UART module (HM-10/CC2540/CC2541)
@@ -61,10 +66,6 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 #define ENABLE_PASS   1        // comment out to disable password authentication
 #define PASS          123456   // choose password for WiFi/BLE communication
 
-// ------- RTK GPS module -----------------------------------
-// see Wiki on how to install the GPS module and configure the jumpers:
-// https://wiki.ardumower.de/index.php?title=Ardumower_Sunray#Bluetooth_BLE_UART_module
-
 // -------- IMU sensor  ----------------------------------------------
 // choose one MPU IMU (make sure to connect AD0 on the MPU board to 3.3v)
 // verify in CONSOLE that your IMU was found (you will hear 8 buzzer beeps for automatic calibration at start)
@@ -86,8 +87,8 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 //  via 'File->Preferences->Full output during compile') - detailed steps here:  
 // https://wiki.ardumower.de/index.php?title=Ardumower_Sunray#SD_card_module
 // https://wiki.ardumower.de/index.php?title=Ardumower_Sunray#SD_card_logging
-//#define ENABLE_SD      1                 // enable SD card services (resuming, logging)? (uncomment to activate)
-//#define ENABLE_SD_LOG  1                 // enable SD card logging? (uncomment to activate)
+#define ENABLE_SD      1                 // enable SD card services (resuming, logging)? (uncomment to activate)
+#define ENABLE_SD_LOG  1                 // enable SD card logging? (uncomment to activate)
 //#define ENABLE_SD_RESUME  1              // enable SD card map load/resume on reset? (uncomment to activate)
 
 
@@ -147,9 +148,9 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 #define MOW_TOGGLE_DIR       true
 //#define MOW_TOGGLE_DIR       false
 
-// should the motor overload detection be enabled?
-//#define ENABLE_OVERLOAD_DETECTION  true
-#define ENABLE_OVERLOAD_DETECTION  false
+// should the error on motor overload detection be enabled?
+//#define ENABLE_OVERLOAD_DETECTION  true    // robot will stop on overload
+#define ENABLE_OVERLOAD_DETECTION  false    // robot will slow down on overload
 
 // should the motor fault (error) detection be enabled? 
 #define ENABLE_FAULT_DETECTION  true
@@ -257,11 +258,17 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 
 
 // ------ GPS ------------------------------------------
+// ------- RTK GPS module -----------------------------------
+// see Wiki on how to install the GPS module and configure the jumpers:
+// https://wiki.ardumower.de/index.php?title=Ardumower_Sunray#Bluetooth_BLE_UART_module
+//
 // NOTE: if you experience GPS checksum errors, try to increase UART FIFO size:
 // 1. Arduino IDE->File->Preferences->Click on 'preferences.txt' at the bottom
 // 2. Locate file 'packages/arduino/hardware/sam/xxxxx/cores/arduino/RingBuffer.h'
 //    (for Adafruit Grand Central M4: 'packages\adafruit\hardware\samd\xxxxx\cores\arduino\RingBuffer.h')
 // change:     #define SERIAL_BUFFER_SIZE 128     into into:     #define SERIAL_BUFFER_SIZE 1024
+
+//#define GPS_SKYTRAQ  1               // comment for ublox gps, uncomment for skytraq gps 
 
 //#define REQUIRE_VALID_GPS  true       // mower will pause if no float and no fix GPS solution during mowing
 #define REQUIRE_VALID_GPS  false    // mower will continue to mow if no float or no fix solution
@@ -276,8 +283,8 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 
 // configure ublox f9p with optimal settings (will be stored in f9p RAM only)
 // NOTE: due to a PCB1.3 bug GPS_RX pin is not working and you have to fix this by a wire:
-// https://wiki.ardumower.de/index.php?title=Ardumower_Sunray#PCB1.3_GPS_pin_fix   (see step 2)
-#define GPS_CONFIG   true     // configure GPS receiver (recommended - requires GPS wire fix above!)
+// https://wiki.ardumower.de/index.php?title=Ardumower_Sunray#PCB1.3_GPS_pin_fix_and_wire_fix   (see 'GPS wire fix')
+#define GPS_CONFIG   true     // configure GPS receiver (recommended - requires GPS wire fix above! otherwise firmware will stuck at boot!)
 //#define GPS_CONFIG   false  // do not configure GPS receiver (no GPS wire fix required)
 
 #define GPS_CONFIG_FILTER   true     // use signal strength filter? (recommended to get rid of 'FIX jumps')
@@ -480,3 +487,10 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
     #define SDCARD_SS_PIN 4
   #endif
 #endif
+
+// the following will be used by Arduino library RingBuffer.h - to verify this Arduino library file:
+// 1. Arduino IDE->File->Preferences->Click on 'preferences.txt' at the bottom
+// 2. Locate file 'packages/arduino/hardware/sam/xxxxx/cores/arduino/RingBuffer.h
+  
+#define SERIAL_BUFFER_SIZE 1024
+
