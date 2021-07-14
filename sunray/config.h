@@ -89,7 +89,7 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 // https://wiki.ardumower.de/index.php?title=Ardumower_Sunray#SD_card_logging
 #define ENABLE_SD      1                 // enable SD card services (resuming, logging)? (uncomment to activate)
 #define ENABLE_SD_LOG  1                 // enable SD card logging? (uncomment to activate)
-//#define ENABLE_SD_RESUME  1              // enable SD card map load/resume on reset? (uncomment to activate)
+#define ENABLE_SD_RESUME  1              // enable SD card map load/resume on reset? (uncomment to activate)
 
 
 // ------ odometry -----------------------------------
@@ -145,8 +145,8 @@ Also, you may choose the serial port below for serial monitor output (CONSOLE).
 #define MOW_OVERLOAD_CURRENT 2.0    // mowing motor overload current (amps)
 
 // should the direction of mowing motor toggle each start? (yes: true, no: false)
-#define MOW_TOGGLE_DIR       true
-//#define MOW_TOGGLE_DIR       false
+//#define MOW_TOGGLE_DIR       true
+#define MOW_TOGGLE_DIR       false
 
 // should the error on motor overload detection be enabled?
 //#define ENABLE_OVERLOAD_DETECTION  true    // robot will stop on overload
